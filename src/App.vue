@@ -195,6 +195,7 @@ watchEffect(() => {
             name: 'DAU',
             itemStyle: {
               color: '#8ED595',
+              borderRadius: [20, 20, 0, 0]
             },
         }],
         grid: {
