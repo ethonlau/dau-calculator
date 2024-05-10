@@ -161,8 +161,8 @@ watchEffect(() => {
     }
 
     function calculateFutureDAU(currentDAU, newUsers, days) {
-        let dailyDAU = [currentDAU];
-        let cumulativeRetention = currentDAU;
+        let dailyDAU = [currentDAU, currentDAU + newUsers];
+        let cumulativeRetention = currentDAU + newUsers;
 
         for (let i = 1; i <= days; i++) {
             cumulativeRetention += retentionRate(i) * newUsers;
@@ -195,6 +195,7 @@ watchEffect(() => {
             name: 'DAU',
             itemStyle: {
               color: '#8ED595',
+              borderRadius: [20, 20, 0, 0]
             },
         }],
         grid: {
@@ -342,6 +343,7 @@ watchEffect(() => {
 
   <footer>
     <div class="intro">{{ INTRO[lang].footer }}</div>
+    <a class="link" href="https://github.com/ethonlau/dau-calculator" target="_blank">Github</a>
   </footer>
 </template>
 
@@ -407,6 +409,10 @@ body {
       max-width: 540px;
       margin: 20px auto;
       user-select: all;
+    }
+    .link {
+      font-size: 14px;
+      color: #89988B;
     }
   }
 
