@@ -343,6 +343,7 @@ watchEffect(() => {
 
   <footer>
     <div class="intro">{{ INTRO[lang].footer }}</div>
+    <a class="link" href="https://github.com/ethonlau/dau-calculator" target="_blank">Github</a>
   </footer>
 </template>
 
@@ -408,6 +409,10 @@ body {
       max-width: 540px;
       margin: 20px auto;
       user-select: all;
+    }
+    .link {
+      font-size: 14px;
+      color: #89988B;
     }
   }
 
