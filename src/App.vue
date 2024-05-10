@@ -161,8 +161,8 @@ watchEffect(() => {
     }
 
     function calculateFutureDAU(currentDAU, newUsers, days) {
-        let dailyDAU = [currentDAU];
-        let cumulativeRetention = currentDAU;
+        let dailyDAU = [currentDAU, currentDAU + newUsers];
+        let cumulativeRetention = currentDAU + newUsers;
 
         for (let i = 1; i <= days; i++) {
             cumulativeRetention += retentionRate(i) * newUsers;
