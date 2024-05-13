@@ -1,11 +1,13 @@
 export const INTRO = {
   zh: {
     header: 'DAU (Daily Active Users)，即某一天活跃的总用户数。我们可以使用简单的数学模型来预测用户留存情况，并据此预测未来的 DAU。',
-    footer: '实际情况中，投放拉新的用户留存会比自然新增的用户留存低，用户的生命周期可能也没有那么长，用户半年后可能都完全流失了。所以这只是个很粗略的模型。\n\n希望这个小工具，能让更多人了解如何科学地做用户增长。'
+    footer: '实际情况中，投放拉新的用户留存会比自然新增的用户留存低，用户的生命周期可能也没有那么长，用户半年后可能都完全流失了。所以这只是个很粗略的模型。\n\n希望这个小工具，能让更多人了解如何科学地做用户增长。',
+    downloadAsCsv: '下载 csv 表格'
   },
   en: {
     header: 'DAU (Daily Active Users), which refers to the total number of active users in a day. We can use a simple mathematical model to predict user retention and, based on this, forecast future DAU."',
-    footer: 'In actual scenarios, the retention of users acquired through new promotions is lower than that of naturally added users, and the user lifecycle might not be as long, leading to complete user attrition after six months. Thus, this is a very rough model.\n\nWe hope this tool can help more people understand how to scientifically grow their user base.'
+    footer: 'In actual scenarios, the retention of users acquired through new promotions is lower than that of naturally added users, and the user lifecycle might not be as long, leading to complete user attrition after six months. Thus, this is a very rough model.\n\nWe hope this tool can help more people understand how to scientifically grow their user base.',
+    downloadAsCsv: 'Download table as CSV'
   }
 }
 

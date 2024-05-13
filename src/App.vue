@@ -62,6 +62,36 @@ const regressionResult = computed(() => {
     return powerLawRegression([1, 7, 30], retentions);
 });
 
+function calculatePowerLawData(a, b, xStart, xEnd, numPoints) {
+    const xData = [];
+    const yData = [];
+    const step = (xEnd - xStart) / (numPoints - 1);
+    for (let i = 0; i < numPoints; i++) {
+        const x = xStart + i * step;
+        const y = a * Math.pow(x, b);
+        xData.push(x);
+        yData.push(y.toFixed(4));
+    }
+    return { xData, yData };
+}
+
+function downloadRetention() {
+    const { a, b } = regressionResult.value;
+    const data = calculatePowerLawData(a, b, 1, 60, 60);
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "day,retention\n"; // Adding header row
+
+    data.xData.forEach((item, index) => {
+        csvContent += `${item},${data.yData[index]}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.href = encodedUri;
+    link.download = 'retention.csv';
+    link.click();
+}
 
 const retentionContainer = ref(null);
 let retentionChart = null;
@@ -74,19 +104,6 @@ watchEffect(() => {
 
     const { a, b } = regressionResult.value;
     const data = calculatePowerLawData(a, b, 1, 60, 60);
-
-    function calculatePowerLawData(a, b, xStart, xEnd, numPoints) {
-        const xData = [];
-        const yData = [];
-        const step = (xEnd - xStart) / (numPoints - 1);
-        for (let i = 0; i < numPoints; i++) {
-            const x = xStart + i * step;
-            const y = a * Math.pow(x, b);
-            xData.push(x);
-            yData.push(y);
-        }
-        return { xData, yData };
-    }
 
     var option = {
         tooltip: {
@@ -145,6 +162,41 @@ watchEffect(() => {
   }
 });
 
+function retentionRate(day) {
+    const { a, b } = regressionResult.value;
+
+    return a * Math.pow(day, b);
+}
+
+function calculateFutureDAU(currentDAU, newUsers, days) {
+    let dailyDAU = [currentDAU, currentDAU + newUsers];
+    let cumulativeRetention = currentDAU + newUsers;
+
+    for (let i = 1; i <= days; i++) {
+        cumulativeRetention += retentionRate(i) * newUsers;
+        dailyDAU.push(cumulativeRetention.toFixed(0));
+    }
+
+    return dailyDAU;
+}
+
+function downloadDau() {
+    const data = calculateFutureDAU(retainedUserCount.value, dailyNewUserCount.value, forecastDayCount.value)
+
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "day,DAU\n"; // Adding header row
+
+    data.forEach((item, index) => {
+        csvContent += `${index},${data[index]}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.href = encodedUri;
+    link.download = 'dau.csv';
+    link.click();
+}
+
 const dauContainer = ref(null);
 let dauChart = null;
 
@@ -154,27 +206,9 @@ watchEffect(() => {
       dauChart = echarts.init(dauContainer.value);
     }
 
-    const { a, b } = regressionResult.value;
-
-    function retentionRate(day) {
-        return a * Math.pow(day, b);
-    }
-
-    function calculateFutureDAU(currentDAU, newUsers, days) {
-        let dailyDAU = [currentDAU, currentDAU + newUsers];
-        let cumulativeRetention = currentDAU + newUsers;
-
-        for (let i = 1; i <= days; i++) {
-            cumulativeRetention += retentionRate(i) * newUsers;
-            dailyDAU.push(cumulativeRetention.toFixed(0));
-        }
-
-        return dailyDAU;
-    }
-
     const futureDAU = calculateFutureDAU(retainedUserCount.value, dailyNewUserCount.value, forecastDayCount.value);
     if (forecastDayCount.value <= futureDAU.length - 1) {
-      finalDAU.value = futureDAU[forecastDayCount.value]
+      finalDAU.value = futureDAU[forecastDayCount.value + 1]
     }
 
     const option = {
@@ -279,8 +313,9 @@ watchEffect(() => {
           </div>
         </div>
         <div class="chart">
-          𝑦 = {{ regressionResult.a.toFixed(4) }}𝑥<sup>{{ regressionResult.b.toFixed(4) }}</sup>
+          <span>𝑦 = {{ regressionResult.a.toFixed(4) }}𝑥<sup>{{ regressionResult.b.toFixed(4) }}</sup></span>
           <div ref="retentionContainer" style="max-width: 100%; width: 420px; height: 300px;"></div>
+          <a @click="downloadRetention">{{ INTRO[lang].downloadAsCsv }}</a>
         </div>
       </div>
     </div>
@@ -333,9 +368,10 @@ watchEffect(() => {
           </div>
         </div>
         <div class="chart">
-          {{ DAU[lang].finalDAU }}
+          <span>{{ DAU[lang].finalDAU }}</span>
           <span style="font-weight: bold;">{{finalDAU}}</span>
           <div ref="dauContainer" style="max-width: 100%; width: 420px; height: 300px;"></div>
+          <a @click="downloadDau">{{ INTRO[lang].downloadAsCsv }}</a>
         </div>
       </div>
     </div>
@@ -547,10 +583,22 @@ body {
       }
       .chart {
         flex: 1;
-        font-size: 15px;
+        font-size: 12px;
         display: inline-block;
         max-width: 100%;
-        user-select: all;
+        span {
+          user-select: all;
+        }
+        a {
+          float: right;
+          padding: 10px;
+          cursor: pointer;
+          color: #bbb;
+
+          &:hover {
+            color: #ddd;
+          }
+        }
       }
     }
   }
